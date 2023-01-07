@@ -109,7 +109,9 @@ appURL()
   }
 ```
 
+## Jar 
 
+And finally you can build JAR and use this keycloak event listener
 
 
 
