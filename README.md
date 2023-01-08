@@ -8,7 +8,7 @@ You must fill in a few parameters to run this extension in your own environment.
 ## CustomRequest.java. 
 
 1. In file src/main/java/ru/spi/eventlistenerprovider/provider/CustomRequest.java you must specife variable endPointCreateUser - This is a restEndpoint in your application that will accept the data of the newly created user and add it to your base
-2. To ensure the security of your endpoint, you will need to check the validity of the gvt token on the side of the external application, which will be generated and sent along with the new user.  
+2. To ensure the security of your endpoint, you will need to check the validity of the JWT token on the side of the external application, which will be generated and sent along with the new user.  
 3. The token is generated using the RS256 algorithm, so you need a public key from your Keycloak realm.  
 <img width="1476" alt="keyKey" src="https://user-images.githubusercontent.com/35899629/211143777-de462c72-7502-4017-bd03-58c4f0b70c57.png">
 
@@ -76,7 +76,7 @@ public static String KEYCLOAK_PUBLIC_KEY = Publick key from keyclock
 ```
 
 
-4. In the configuration file of the clock at this path - /keycloak-20.0.1/conf/keycloak.conf  you must add a new parameter "app-url" - to the end of the file with a value that will point to the url of your server where the application is located. This parameter is read inside the src/main/java/ru/spi/eventlistenerprovider/provider/CustomRequest.appURL() method
+4. In the configuration file of the Keycloak at this path - /keycloak-20.0.1/conf/keycloak.conf  you must add a new parameter "app-url" - to the end of the file with a value that will point to the url of your server where the application is located. This parameter is read inside the src/main/java/ru/spi/eventlistenerprovider/provider/CustomRequest.appURL() method
 
 Example: 
 
