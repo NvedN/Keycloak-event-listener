@@ -7,20 +7,20 @@ You must fill in a few parameters to run this extension in your own environment.
 
 ## CustomRequest.java. 
 
-1. In file src/main/java/ru/spi/eventlistenerprovider/provider/CustomRequest.java you must specife variable endPointCreateUser - This is a restEndpoint in your application that will accept the data of the newly created user and add it to your base
-2. To ensure the security of your endpoint, you will need to check the validity of the JWT on the side of the external application, which will be generated and sent along with the new user.  
+1. In file `src/main/java/ru/spi/eventlistenerprovider/provider/CustomRequest.java` you must specify variable `endPointCreateUser` - This is a restEndpoint in your application that will accept the data of the newly created user and add it to your base
+2. To ensure the security of your endpoint, you will need to check the validity of the JWT on the side of the external application, which will be generated and sent along with the new user.
 3. The token is generated using the RS256 algorithm, so you need a public key from your Keycloak realm.  
 <img width="1476" alt="keyKey" src="https://user-images.githubusercontent.com/35899629/211143777-de462c72-7502-4017-bd03-58c4f0b70c57.png">
 
 
 Example: 
 
-```
+```java
 
-public static String KEYCLOAK_PUBLIC_KEY = Publick key from keyclock 
+public static String KEYCLOAK_PUBLIC_KEY = "Publick_key_from_keyclock" 
 
 /**
-   * Endpint to sync user with keycloak DB
+   * Endpoint to sync user with keycloak DB
    *
    * @param token {@code String} generated token from keycloak
    * @param userDTO {@code UserDTO} user DTO
@@ -42,7 +42,7 @@ public static String KEYCLOAK_PUBLIC_KEY = Publick key from keyclock
 
 ```
 
-```
+```java
 /**
    * @param keycloakPublicKey{@code String} public key generated in keycloak web app and stored on
    *     application.properties file
@@ -76,19 +76,19 @@ public static String KEYCLOAK_PUBLIC_KEY = Publick key from keyclock
 ```
 
 
-4. In the configuration file of the Keycloak at this path - /keycloak-20.0.1/conf/keycloak.conf  you must add a new parameter "app-url" - to the end of the file with a value that will point to the url of your server where the application is located. This parameter is read inside the src/main/java/ru/spi/eventlistenerprovider/provider/CustomRequest.appURL() method
+4. In the configuration file of the Keycloak at this path - `/keycloak-20.0.1/conf/keycloak.conf`  you must add a new parameter "app-url" - to the end of the file with a value that will point to the url of your server where the application is located. This parameter is read inside the `src/main/java/ru/spi/eventlistenerprovider/provider/CustomRequest.appURL()` method
 
 Example: 
 
 keycloak.conf 
 ```
-app-url=http://192.168.1.179:8080/app
+app-url=http://localhost:8080/app
 ```
 
 <img width="879" alt="appUrl" src="https://user-images.githubusercontent.com/35899629/211144157-7cd7f0dd-689f-4cca-83fd-7596289b1d22.png">
 
 appURL()
-```
+```java
 /**
    * Method to read url from keycloak config file
    *
