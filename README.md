@@ -43,7 +43,7 @@ public static String KEYCLOAK_PUBLIC_KEY = "Publick_key_from_keyclock"
 
 
 
-4. In the configuration file of the Keycloak at this path - `/keycloak-20.0.1/conf/keycloak.conf`  you must add a new parameter "app-url" - to the end of the file with a value that will point to the url of your server where the application is located. This parameter is read inside the `src/main/java/ru/spi/eventlistenerprovider/provider/CustomRequest.appURL()` method
+2. In the configuration file of the Keycloak at this path - `/keycloak-20.0.1/conf/keycloak.conf`  you must add a new parameter "app-url" - to the end of the file with a value that will point to the url of your server where the application is located. This parameter is read inside the `src/main/java/ru/spi/eventlistenerprovider/provider/CustomRequest.appURL()` method
 
 Example: 
 
@@ -80,5 +80,57 @@ appURL()
 
 And finally you can build JAR and use this keycloak event listener
 
+#Synchronizing keycloak users with application users  
+You can also synchronize users from your application with the keycloak user database.  
+To do this, you will need to use the cycleclock libraries and create a cycleclock instance in your application. See src/services/KeycloakService.java
+
+```java
+/**
+   * Synchronizing keycloak users with application users
+   *
+   * @author NVN
+   * @since 2023.01.11
+   */
+  @RolesAllowed(AlfaConstants.ROLE_ADMIN)
+  @QueryMapping
+  public List<UserDTO> syncUsersWithKeycloak() {
+    List<UserRepresentation> keycloakUsers = keycloakService.getAllUsers();
+    return userService.syncUsersWithKeycloak(keycloakUsers);
+  }
+  
+  
+  
+  
+  
+/**
+   * Method to synchronizing keycloak users with application users
+   *
+   * @param keycloakUsers {@code List<UserRepresentation>} list with Keycloak users
+   * @author NVN
+   * @since 2023.01.11
+   */
+  @Transactional
+  public List<UserDTO> syncUsersWithKeycloak(List<UserRepresentation> keycloakUsers) {
+
+    List<User> environmentUsers = userRepository.findAll();
+    ArrayList<UserDTO> listWithNewUsers = new ArrayList<>();
+    for (UserRepresentation keycloakUser : keycloakUsers) {
+      User newUser =
+          environmentUsers.stream()
+              .filter(user -> user.getId().equals(UUID.fromString(keycloakUser.getId())))
+              .findAny()
+              .orElse(null);
+      if (newUser == null) {
+        newUser = userMapper.keycloakUserToApplication(keycloakUser);
+        userRepository.save(newUser);
+        listWithNewUsers.add(userMapper.toDto(newUser));
+      }
+    }
+    return listWithNewUsers;
+  }  
+  
+  
+  
+```
 
 
