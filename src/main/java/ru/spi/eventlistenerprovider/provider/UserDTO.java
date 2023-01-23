@@ -1,6 +1,7 @@
 package ru.spi.eventlistenerprovider.provider;
 
 
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -13,20 +14,38 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UserDTO {
 
+  public UUID id;
   public String username;
   public String email;
   public Long createdTimestamp;
   public String firstName;
   public String lastName;
 
+  public UserDTO(UUID userId) {
+    this.id = userId;
+  }
+
   @Override
   public String toString() {
-    return "{" +
-        "\"username\":\"" + username + '\"' +
-        ", \"email\":\"" + email + '\"' +
-        ", \"createdTimestamp\":\"" + createdTimestamp + '\"'+
-        ", \"firstName\":\"" + firstName + '\"' +
-        ", \"lastName\":\"" + lastName + '\"' +
-        "}";
+    return "{"
+        + "\"id\":\""
+        + id
+        + '\"'
+        + ", \"username\":\""
+        + username
+        + '\"'
+        + ", \"email\":\""
+        + email
+        + '\"'
+        + ", \"createdTimestamp\":\""
+        + createdTimestamp
+        + '\"'
+        + ", \"firstName\":\""
+        + firstName
+        + '\"'
+        + ", \"lastName\":\""
+        + lastName
+        + '\"'
+        + "}";
   }
 }

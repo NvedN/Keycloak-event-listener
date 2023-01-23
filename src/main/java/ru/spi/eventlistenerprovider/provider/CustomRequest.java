@@ -6,7 +6,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
-import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.util.Properties;
 import lombok.extern.slf4j.Slf4j;
@@ -16,42 +15,70 @@ import org.keycloak.crypto.KeyWrapper;
 import org.keycloak.jose.jws.JWSBuilder;
 import org.keycloak.models.KeycloakContext;
 import org.keycloak.models.KeycloakSession;
-import org.keycloak.models.UserModel;
 import org.keycloak.representations.AccessToken;
+import org.keycloak.representations.AccessToken.Access;
 import org.keycloak.services.Urls;
 
 @Slf4j
 public class CustomRequest {
 
-  private static String endPointCreateUser = "/user/createUser";
+  /**
+   * Endpoint to create user
+   */
+  private static String endPointCreateOrUpdateUser = "/user/createUser";
+
+  /**
+   * Endpoint to delete user
+   */
+  static String endPointDeleteUser = "/user/deleteUser";
+
+  /**
+   * Constant for register value
+   */
+  static String REGISTER = "Register";
+
+  /**
+   * Constant for Update value
+   */
+  static String UPDATE = "Update";
+
+  /**
+   * Constant for Delete value
+   */
+  static String DELETE = "Delete";
 
   /**
    * Method to send request to springboot App end point with registered user credentials in DTO
    *
-   * @param newUser {@code UserDTO} uset DTO
-   * @param newRegisteredUser {@code UserModel} UserModel object
+   * @param userDTO {@code UserDTO} uset DTO
    * @param session {@code KeycloakSession} keycloak session object
-   * @throws IOException if something went wrong with request
-   * @throws InterruptedException if something went wrong with request
+   * @param type    {@code String} with event type
    * @author NVN
    * @since 2022.12.28
    */
-  public static void sendRequest(
-      UserDTO newUser, UserModel newRegisteredUser, KeycloakSession session)
-      throws IOException, InterruptedException {
-
+  public static void sendRequest(UserDTO userDTO, KeycloakSession session, String type) {
+    String endPoint = type.equals(DELETE) ? endPointDeleteUser : endPointCreateOrUpdateUser;
     HttpClient client = HttpClient.newHttpClient();
-    String accessToken = getAccessToken(newRegisteredUser, session);
+    String accessToken = getAccessToken(session);
     HttpRequest request =
         HttpRequest.newBuilder()
-            .uri(URI.create(appURL() + endPointCreateUser))
-            .headers("token", accessToken, "Content-Type", "application/json")
-            .POST(BodyPublishers.ofString(newUser.toString()))
+            .uri(URI.create(appURL() + endPoint))
+            .headers("Authorization", "Bearer " + accessToken,
+                "Content-Type", "application/json", "Accept", "*/*")
+            .POST(BodyPublishers.ofString(userDTO.toString()))
             .build();
-
-    String response =
-        client.sendAsync(request, BodyHandlers.ofString()).thenApply(HttpResponse::body).join();
-    log.info("-------response = " + response);
+    client
+        .sendAsync(request, BodyHandlers.ofString())
+        .thenAccept(
+            response ->
+                log.info(
+                    "Event type ="
+                        + type
+                        + "\n User DTO ="
+                        + userDTO
+                        + "\n  Response status code: "
+                        + response.statusCode()))
+        .join();
   }
 
   /**
@@ -76,21 +103,22 @@ public class CustomRequest {
   /**
    * Method to generate valid JWT token with keycloak credentials
    *
-   * @param userModel {@code UserModel} UserModel object
    * @param keycloakSession {@code KeycloakSession} keycloak session object
    * @author NVN
    * @since 2022.12.28
    */
-  public static String getAccessToken(UserModel userModel, KeycloakSession keycloakSession) {
+  public static String getAccessToken(KeycloakSession keycloakSession) {
     KeycloakContext keycloakContext = keycloakSession.getContext();
-
     AccessToken token = new AccessToken();
-    token.setSubject(userModel.getId());
     token.issuer(
         Urls.realmIssuer(
             keycloakContext.getUri().getBaseUri(), keycloakContext.getRealm().getName()));
     token.issuedNow();
     token.expiration((int) (token.getIat() + 60L)); // Lifetime of 60 seconds
+    token.type("Bearer");
+    token.setSubject("admin-cli");
+    token.addAccess("admin-api").addRole("admin-role");
+    token.setRealmAccess(new Access().addRole("role_admin"));
 
     KeyWrapper key =
         keycloakSession.keys().getActiveKey(keycloakContext.getRealm(), KeyUse.SIG, "RS256");
