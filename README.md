@@ -82,7 +82,8 @@ And finally you can build JAR and use this keycloak event listener
 
 # Synchronizing keycloak users with application users  
 You can also synchronize users from your application with the keycloak user database.  
-To do this, you will need to use the cycleclock libraries and create a cycleclock instance in your application. See src/services/KeycloakService.java
+To do this, you will need to use the cycleclock libraries and create a cycleclock instance in your application.  
+In file `src/services/KeycloakService.java` you can see how to get a Keycloak instance
 
 ```java
 /**
