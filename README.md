@@ -7,11 +7,7 @@ You must fill in a few parameters to run this extension in your own environment.
 
 ## CustomRequest.java. 
 
-1. In file `src/main/java/ru/spi/eventlistenerprovider/provider/CustomRequest.java` you must specify variable `endPointCreateUser` - This is a restEndpoint in your application that will accept the data of the newly created user and add it to your base
-2. To ensure the security of your endpoint, you will need to check the validity of the JWT on the side of the external application, which will be generated and sent along with the new user.
-3. The token is generated using the RS256 algorithm, so you need a public key from your Keycloak realm.  
-<img width="1476" alt="keyKey" src="https://user-images.githubusercontent.com/35899629/211143777-de462c72-7502-4017-bd03-58c4f0b70c57.png">
-
+1. In file `src/main/java/ru/spi/eventlistenerprovider/provider/CustomRequest.java` you must specify variable `endPointCreateUser` and `endPointDeleteUser` - This is a restEndpoint in your application that will accept the data of the newly created user and add it to your base
 
 Example: 
 
@@ -22,58 +18,29 @@ public static String KEYCLOAK_PUBLIC_KEY = "Publick_key_from_keyclock"
 /**
    * Endpoint to sync user with keycloak DB
    *
-   * @param token {@code String} generated token from keycloak
    * @param userDTO {@code UserDTO} user DTO
-   * @throws NoSuchAlgorithmException if something went wrong with request
-   * @throws InvalidKeySpecException if something went wrong with request
+   * @author NVN
+   * @since 2023.01.17
    */
   @PostMapping(value = "/createUser")
-  public void syncUsersWithKeycloak(
-      @RequestHeader(value = "token") String token, @RequestBody UserDTO userDTO) throws Exception {
-
-    log.info(messageSource.getMessage("message.jwt.check", null, Locale.US));
-    jwtUtil.validateToken(KEYCLOAK_PUBLIC_KEY, token);
-    log.info(messageSource.getMessage("message.jwt.isValid", null, Locale.US));
-
-    if (userDTO != null) {
-      userService.createUser(userDTO);
-    }
+  public void createOrUpdateUserFromKeycloak(@RequestBody UserDTO userDTO) {
+    userService.createUser(userDTO);
   }
-
-```
-
-```java
-/**
-   * @param keycloakPublicKey{@code String} public key generated in keycloak web app and stored on
-   *     application.properties file
-   * @param token {@code String} toke from request header
-   * @throws NoSuchAlgorithmException If something went wrong
-   * @throws InvalidKeySpecException If something went wrong
+  
+  
+  /**
+   * Endpoint to delete user from DB
+   *
+   * @param userDTO {@code UserDTO} user DTO
    * @author NVN
-   * @since 2022.12.28
+   * @since 2023.01.17
    */
-  public void validateToken(String keycloakPublicKey, String token)
-      throws Exception {
-    X509EncodedKeySpec keySpec =
-        new X509EncodedKeySpec(Base64.getDecoder().decode(keycloakPublicKey));
-    KeyFactory kf = KeyFactory.getInstance("RSA");
-    PublicKey publicKey = kf.generatePublic(keySpec);
-
-    Jwts.parserBuilder()
-        .setSigningKey(publicKey) // <---- publicKey, not privateKey
-        .build()
-        .parseClaimsJws(token);
-
-    try {
-      Jwts.parserBuilder().setSigningKey(publicKey).build().parseClaimsJws(token);
-    } catch (Exception e) {
-      log.error(messageSource.getMessage(
-          "message.jwt.isInvalid", null, Locale.US), e);
-      throw new Exception();
-      // if you get error, that means token is invalid.
-    }
+  @PostMapping(value = "/deleteUser")
+  public void deleteUser(@RequestBody UserDTO userDTO) {
+    userService.deleteUser(userDTO.getId());
   }
 ```
+
 
 
 4. In the configuration file of the Keycloak at this path - `/keycloak-20.0.1/conf/keycloak.conf`  you must add a new parameter "app-url" - to the end of the file with a value that will point to the url of your server where the application is located. This parameter is read inside the `src/main/java/ru/spi/eventlistenerprovider/provider/CustomRequest.appURL()` method
