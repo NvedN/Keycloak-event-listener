@@ -99,7 +99,27 @@ To do this, you will need to use the cycleclock libraries and create a cyclecloc
   }
   
   
-  
+  private Keycloak getInstance() {
+    return KeycloakBuilder.builder()
+        .serverUrl(SERVER_URL)
+        .realm(MASTER_REALM)
+        .username(USERNAME)
+        .password(PASSWORD)
+        .clientId(CLIENT_ID)
+        .resteasyClient(new ResteasyClientBuilderImpl().connectionPoolSize(10).build())
+        .build();
+  }
+
+  /**
+   * Method to get all users from keycloak DB
+   *
+   * @return List with keycloak users
+   * @author NVN
+   * @since 2023.01.11
+   */
+  public List<UserRepresentation> getAllUsers() {
+    return getInstance().realm(REALM).users().list();
+  }
   
   
 /**
