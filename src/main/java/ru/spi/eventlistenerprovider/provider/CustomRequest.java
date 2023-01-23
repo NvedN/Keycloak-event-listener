@@ -25,7 +25,7 @@ public class CustomRequest {
   /**
    * Endpoint to create user
    */
-  private static String endPointCreateOrUpdateUser = "/user/createUser";
+  static String endPointCreateOrUpdateUser = "/user/createUser";
 
   /**
    * Endpoint to delete user
