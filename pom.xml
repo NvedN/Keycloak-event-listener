@@ -6,11 +6,11 @@
     <version>20.0.3</version>
   </parent>
 
-  <name>Register Event Listener</name>
+  <name>Event Listener</name>
   <description/>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>register_event_listener</artifactId>
+  <artifactId>event_listener</artifactId>
   <packaging>jar</packaging>
 
   <dependencies>
@@ -63,7 +63,7 @@
   </dependencies>
 
   <build>
-    <finalName>Register-event-listener</finalName>
+    <finalName>Event-listener</finalName>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
