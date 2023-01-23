@@ -1,4 +1,4 @@
-# Keycloak-register-event-listener guide 
+# Keycloak-event-listener guide 
 for Keycloak version 20+
 
 This extension is designed to synchronize the database of users of the Keycloak with the database of your application.  
