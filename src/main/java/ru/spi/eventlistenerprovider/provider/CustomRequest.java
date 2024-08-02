@@ -25,12 +25,12 @@ public class CustomRequest {
   /**
    * Endpoint to create user
    */
-  static String endPointCreateOrUpdateUser = "/user/createUser";
+  static String endPointCreateOrUpdateUser = "/user/create";
 
   /**
    * Endpoint to delete user
    */
-  static String endPointDeleteUser = "/user/deleteUser";
+  static String endPointDeleteUser = "/user/delete";
 
   /**
    * Constant for register value
