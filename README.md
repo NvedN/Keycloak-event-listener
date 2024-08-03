@@ -22,7 +22,7 @@ public static String KEYCLOAK_PUBLIC_KEY = "Publick_key_from_keyclock"
    * @author NVN
    * @since 2023.01.17
    */
-  @PostMapping(value = "/createUser")
+  @PostMapping(value = "/create")
   public void createOrUpdateUserFromKeycloak(@RequestBody UserDTO userDTO) {
     userService.createUser(userDTO);
   }
@@ -35,7 +35,7 @@ public static String KEYCLOAK_PUBLIC_KEY = "Publick_key_from_keyclock"
    * @author NVN
    * @since 2023.01.17
    */
-  @PostMapping(value = "/deleteUser")
+  @DeleteMapping(value = "/delete")
   public void deleteUser(@RequestBody UserDTO userDTO) {
     userService.deleteUser(userDTO.getId());
   }
